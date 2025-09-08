@@ -5,8 +5,8 @@ import {
   CreateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Project } from '../../project/entitity/Project-entity';
-import { Task } from '../../task/entitity/Task-entity';
+import { Project } from '../../project/entities/project.entity';
+import { Task } from '../../task/entities/task.entity';
 
 @Entity()
 export class User {

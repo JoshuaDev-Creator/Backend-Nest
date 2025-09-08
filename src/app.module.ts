@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entitity/User-entity';
-import { UserService } from './user/User-service';
-import { UserController } from './user/User-controller';
-import { Project } from './project/entitity/Project-entity';
-import { ProjectController } from './project/Project-controller';
-import { ProjectService } from './project/Project-service';
-import { Task } from './task/entitity/Task-entity';
-import { TaskController } from './task/Task-controllers';
-import { TaskService } from './task/Task-service';
+import { User } from './user/entities/user.entity';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
+import { Project } from './project/entities/project.entity';
+import { ProjectController } from './project/project.controller';
+import { ProjectService } from './project/project.service';
+import { Task } from './task/entities/task.entity';
+import { TaskController } from './task/task.controllers';
+import { TaskService } from './task/task.service';
 
 @Module({
   imports: [

@@ -1,5 +1,5 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { Task } from 'src/task/entitity/Task-entity';
+import { Task } from 'src/task/entities/task.entity';
 import { Repository } from 'typeorm';
 
 export class TaskService {
