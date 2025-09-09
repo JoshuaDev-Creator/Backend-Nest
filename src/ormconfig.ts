@@ -14,8 +14,8 @@ export const dataSourceOptions: DataSourceOptions = {
   ssl: {
     rejectUnauthorized: false,
   },
-  entities: [join(__dirname, '**', '*.entity.ts')],
-  migrations: [join(__dirname, 'database', 'migrations', '*.ts')],
+  entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+  migrations: [join(__dirname, 'database', 'migrations', '*{.ts,.js}')],
   synchronize: false,
   migrationsRun: false,
   logging: true,
