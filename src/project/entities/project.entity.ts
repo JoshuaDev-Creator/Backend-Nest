@@ -5,10 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Task } from '../../task/entities/task.entity';
+import { Reminder } from '../../reminder/entities/reminder.entity';
 
 @Entity()
 export class Project {
@@ -25,7 +27,7 @@ export class Project {
   @Column('text')
   description: string;
 
-  @Column()
+  @Column({ default: 'ACTIVE' })
   status: string;
 
   @Column({ type: 'date' })
@@ -39,4 +41,7 @@ export class Project {
 
   @OneToMany(() => Task, (Task) => Task.project)
   task: any;
+
+  @OneToOne(() => Reminder, (Reminder) => Reminder.project)
+  reminder: Reminder;
 }

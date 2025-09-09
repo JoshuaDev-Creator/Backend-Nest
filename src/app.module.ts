@@ -1,31 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './user/entities/user.entity';
-import { UserService } from './user/user.service';
-import { UserController } from './user/user.controller';
-import { Project } from './project/entities/project.entity';
-import { ProjectController } from './project/project.controller';
-import { ProjectService } from './project/project.service';
-import { Task } from './task/entities/task.entity';
-import { TaskController } from './task/task.controllers';
-import { TaskService } from './task/task.service';
+import { dataSourceOptions } from './ormconfig';
+import { ConfigModule } from '@nestjs/config';
+import { UserModule } from './user/user.module';
+import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.modue';
+import { ReminderModule } from './reminder/reminder.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: '1234',
-      database: 'postgres',
-      entities: [User, Project, Task],
-      synchronize: false,
-    }),
-    TypeOrmModule.forFeature([User, Project, Task]),
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRoot(dataSourceOptions),
+    UserModule,
+    ProjectModule,
+    TaskModule,
+    ReminderModule,
   ],
-
-  controllers: [UserController, ProjectController, TaskController],
-  providers: [UserService, ProjectService, TaskService],
 })
 export class AppModule {}

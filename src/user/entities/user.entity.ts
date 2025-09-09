@@ -4,9 +4,11 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Project } from '../../project/entities/project.entity';
 import { Task } from '../../task/entities/task.entity';
+import { Reminder } from '../../reminder/entities/reminder.entity';
 
 @Entity()
 export class User {
@@ -29,5 +31,8 @@ export class User {
   projects: Project[];
 
   @OneToMany(() => Task, (Task) => Task.user)
-  task: Task;
+  task: Task[];
+
+  @OneToOne(() => Reminder, (Reminder) => Reminder.user)
+  reminder: Reminder;
 }
