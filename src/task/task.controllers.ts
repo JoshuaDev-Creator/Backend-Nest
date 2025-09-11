@@ -23,7 +23,7 @@ export class TaskController {
     try {
       return await this.taskService.createTaskForProject(taskData);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Task creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -48,7 +48,7 @@ export class TaskController {
     try {
       return await this.taskService.updateTask(id, taskData);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Update failed');
+      throw new BadRequestException(error.message);
     }
   }
 

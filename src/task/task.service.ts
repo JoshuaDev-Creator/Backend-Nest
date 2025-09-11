@@ -21,7 +21,7 @@ export class TaskService {
       const task = this.taskRepository.create(taskData);
       return await this.taskRepository.save(task);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Task creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 

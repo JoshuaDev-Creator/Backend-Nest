@@ -24,7 +24,7 @@ export class UserController {
     try {
       return await this.userService.createUser(userData);
     } catch (error) {
-      throw new BadRequestException(error.message || 'User creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 
@@ -58,7 +58,7 @@ export class UserController {
     try {
       return await this.userService.UpdateUser(id, userData);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Update failed');
+      throw new BadRequestException(error.message);
     }
   }
 

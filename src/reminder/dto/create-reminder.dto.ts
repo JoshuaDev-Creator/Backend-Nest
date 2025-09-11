@@ -1,6 +1,6 @@
 import { IsNotEmpty, Length } from 'class-validator';
 
-export class createReminderDto {
+export class CreateReminderDto {
   @IsNotEmpty()
   @Length(2, 50)
   title: string;

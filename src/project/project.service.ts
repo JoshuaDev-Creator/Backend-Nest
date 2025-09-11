@@ -21,7 +21,7 @@ export class ProjectService {
       const project = this.projectRepository.create(projectData);
       return await this.projectRepository.save(project);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Project creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 

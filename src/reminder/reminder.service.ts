@@ -22,9 +22,7 @@ export class ReminderService {
       const reminder = this.reminderRepository.create(reminderData);
       return await this.reminderRepository.save(reminder);
     } catch (error) {
-      throw new BadRequestException(
-        error.message || 'Reminder creation failed',
-      );
+      throw new BadRequestException(error.message);
     }
   }
 

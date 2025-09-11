@@ -23,7 +23,7 @@ export class ProjectController {
     try {
       return await this.projectService.createProjectForUser(projectData);
     } catch (error) {
-      throw new BadRequestException(error.message || 'Project creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 

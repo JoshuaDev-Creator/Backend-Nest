@@ -14,7 +14,6 @@ import { Project } from 'src/project/entities/project.entity';
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Project) private projectRepository: Repository<Project>,
   ) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
@@ -22,7 +21,7 @@ export class UserService {
       const user = this.userRepository.create(userData);
       return await this.userRepository.save(user);
     } catch (error) {
-      throw new BadRequestException(error.message || 'User creation failed');
+      throw new BadRequestException(error.message);
     }
   }
 

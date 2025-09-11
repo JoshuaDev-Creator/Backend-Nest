@@ -23,9 +23,7 @@ export class ReminderController {
     try {
       return await this.reminderService.createReminderForProject(reminderData);
     } catch (error) {
-      throw new BadRequestException(
-        error.message || 'Reminder creation failed',
-      );
+      throw new BadRequestException(error.message);
     }
   }
 
