@@ -8,25 +8,26 @@ import {
 } from 'typeorm';
 import { Project } from '../../project/entities/project.entity';
 import { User } from '../../user/entities/user.entity';
+import { on } from 'events';
 
 @Entity()
 export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   title: string;
 
-  @Column({ type: 'text', nullable: true })
+  @Column()
   description: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ default: 'PENDING' })
   status: string;
 
-  @Column({ type: 'varchar', length: 50 })
+  @Column()
   priority: string;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp' })
   due_date: string;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -36,7 +37,7 @@ export class Task {
   @JoinColumn({ name: 'project_id' })
   projectId: Project;
 
-  @ManyToOne(() => User, (User) => User.task)
+  @ManyToOne(() => User, (User) => User.task, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'assigned_to' })
   user: User;
 }

@@ -26,4 +26,9 @@ export class ProjectController {
   getOneProject(id: number): Promise<Project | null> {
     return this.projectService.getOneProject(id);
   }
+
+  @Get(':id')
+  getTasksOfProject(id: number): Promise<Project | null> {
+    return this.projectService.getTasksOfProject(id);
+  }
 }

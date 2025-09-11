@@ -11,4 +11,15 @@ export class TaskService {
     const data = this.taskRepositary.create(TaskData);
     return this.taskRepositary.save(data);
   }
+  async deleteTask(id: number): Promise<void> {
+    await this.taskRepositary.delete(id);
+  }
+
+  async updateTask(id: number, taskData): Promise<void> {
+    await this.taskRepositary.update(id, taskData);
+  }
+
+  async getOneTasK(id: number): Promise<Task | null> {
+    return this.taskRepositary.findOneBy({ id });
+  }
 }

@@ -4,6 +4,7 @@ import { Project } from 'src/project/entities/project.entity';
 import { Repository } from 'typeorm';
 import { createProjectDto } from './dto/create-project.dto';
 import { updateProjectDto } from './dto/update-project.dto';
+import { Task } from 'src/task/entities/task.entity';
 
 Injectable;
 export class ProjectService {
@@ -29,5 +30,12 @@ export class ProjectService {
 
   async getOneProject(id: number): Promise<Project | null> {
     return this.projectRepositary.findOneBy({ id });
+  }
+
+  async getTasksOfProject(id: number): Promise<Project | null> {
+    return this.projectRepositary.findOne({
+      where: { id: id },
+      relations: ['tasks'],
+    });
   }
 }
