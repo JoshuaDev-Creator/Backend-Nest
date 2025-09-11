@@ -1,25 +1,49 @@
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from 'src/task/entities/task.entity';
 import { Repository } from 'typeorm';
+import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update.task.dto';
 
+@Injectable()
 export class TaskService {
   constructor(
-    @InjectRepository(Task) private taskRepositary: Repository<Task>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
   ) {}
 
-  createTaskForProject(TaskData: Partial<Task>) {
-    const data = this.taskRepositary.create(TaskData);
-    return this.taskRepositary.save(data);
+  async createTaskForProject(taskData: CreateTaskDto): Promise<Task> {
+    try {
+      const task = this.taskRepository.create(taskData);
+      return await this.taskRepository.save(task);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Task creation failed');
+    }
   }
+
   async deleteTask(id: number): Promise<void> {
-    await this.taskRepositary.delete(id);
+    const result = await this.taskRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
   }
 
-  async updateTask(id: number, taskData): Promise<void> {
-    await this.taskRepositary.update(id, taskData);
+  async updateTask(id: number, taskData: UpdateTaskDto): Promise<void> {
+    const result = await this.taskRepository.update(id, taskData);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
   }
 
-  async getOneTasK(id: number): Promise<Task | null> {
-    return this.taskRepositary.findOneBy({ id });
+  async getOneTask(id: number): Promise<Task> {
+    const task = await this.taskRepository.findOneBy({ id });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    return task;
   }
 }

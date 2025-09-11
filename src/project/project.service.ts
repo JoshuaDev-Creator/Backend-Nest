@@ -1,41 +1,65 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/project/entities/project.entity';
 import { Repository } from 'typeorm';
-import { createProjectDto } from './dto/create-project.dto';
-import { updateProjectDto } from './dto/update-project.dto';
-import { Task } from 'src/task/entities/task.entity';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
-Injectable;
+@Injectable()
 export class ProjectService {
   constructor(
-    @InjectRepository(Project) private projectRepositary: Repository<Project>,
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
   ) {}
 
-  async createProjectForUser(projectData: createProjectDto): Promise<Project> {
-    const project = this.projectRepositary.create(projectData);
-    return this.projectRepositary.save(project);
+  async createProjectForUser(projectData: CreateProjectDto): Promise<Project> {
+    try {
+      const project = this.projectRepository.create(projectData);
+      return await this.projectRepository.save(project);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Project creation failed');
+    }
   }
 
   async deleteProject(id: number): Promise<void> {
-    await this.projectRepositary.delete(id);
+    const result = await this.projectRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
   }
 
   async updateProject(
     id: number,
-    projectData: updateProjectDto,
+    projectData: UpdateProjectDto,
   ): Promise<void> {
-    await this.projectRepositary.update(id, projectData);
+    const result = await this.projectRepository.update(id, projectData);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
   }
 
-  async getOneProject(id: number): Promise<Project | null> {
-    return this.projectRepositary.findOneBy({ id });
+  async getOneProject(id: number): Promise<Project> {
+    const project = await this.projectRepository.findOneBy({ id });
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    return project;
   }
 
-  async getTasksOfProject(id: number): Promise<Project | null> {
-    return this.projectRepositary.findOne({
-      where: { id: id },
+  async getTasksOfProject(id: number): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id },
       relations: ['tasks'],
     });
+    if (!project) {
+      throw new NotFoundException(
+        `No project or tasks found for project ID ${id}`,
+      );
+    }
+    return project;
   }
 }

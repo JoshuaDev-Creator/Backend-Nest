@@ -1,6 +1,6 @@
 import { IsOptional, Length } from 'class-validator';
 
-export class updateProjectDto {
+export class UpdateProjectDto {
   @IsOptional()
   @Length(2, 50)
   title?: string;

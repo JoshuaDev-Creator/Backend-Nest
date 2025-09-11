@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
@@ -13,24 +17,38 @@ export class UserService {
     @InjectRepository(Project) private projectRepository: Repository<Project>,
   ) {}
 
-  async create(userData: CreateUserDto): Promise<User> {
-    const user = this.userRepository.create(userData);
-    return this.userRepository.save(user);
+  async createUser(userData: CreateUserDto): Promise<User> {
+    try {
+      const user = this.userRepository.create(userData);
+      return await this.userRepository.save(user);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'User creation failed');
+    }
   }
 
-  async delete(id: number): Promise<void> {
-    await this.userRepository.delete(id);
+  async deleteUser(id: number): Promise<void> {
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
   }
 
-  async getOne(id: number): Promise<{ email: string; name: string } | null> {
-    return this.userRepository.findOne({
+  async getOneUser(id: number): Promise<{ email: string; name: string }> {
+    const user = await this.userRepository.findOne({
       where: { id },
       select: ['email', 'name'],
     });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 
-  async Update(id: number, userData: UpdateUserDto): Promise<void> {
-    await this.userRepository.update(id, userData);
+  async UpdateUser(id: number, userData: UpdateUserDto): Promise<void> {
+    const result = await this.userRepository.update(id, userData);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
   }
 
   async GetRecentUsers(): Promise<User[]> {
@@ -42,9 +60,18 @@ export class UserService {
 
   async getCorrespondingUserProjects(id: number): Promise<Project[]> {
     const user = await this.userRepository.findOne({
-      where: { id: id },
-      relations: ['projects'],
+      where: { id },
+      relations: ['projects'], // eager load projects
     });
-    return user?.projects || [];
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (!user.projects || user.projects.length === 0) {
+      throw new NotFoundException(`No projects found for user ID ${id}`);
+    }
+
+    return user.projects;
   }
 }

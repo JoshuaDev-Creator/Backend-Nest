@@ -1,30 +1,63 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Param,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Task } from 'src/task/entities/task.entity';
 import { TaskService } from 'src/task/task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
-import { updateTaskDto } from './dto/update.task.dto';
+import { UpdateTaskDto } from './dto/update.task.dto';
 
-@Controller('task')
+@Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
 
   @Post()
-  createTask(@Body() taskData: CreateTaskDto): Promise<Task> {
-    return this.taskService.createTaskForProject(taskData);
+  async createTask(@Body() taskData: CreateTaskDto): Promise<Task> {
+    try {
+      return await this.taskService.createTaskForProject(taskData);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Task creation failed');
+    }
   }
 
   @Delete(':id')
-  deleteTask(id: number): Promise<void> {
+  async deleteTask(@Param('id') id: number): Promise<void> {
+    const task = await this.taskService.getOneTask(id);
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
     return this.taskService.deleteTask(id);
   }
 
   @Put(':id')
-  updateTask(id: number, @Body() taskData: updateTaskDto): Promise<void> {
-    return this.taskService.updateTask(id, taskData);
+  async updateTask(
+    @Param('id') id: number,
+    @Body() taskData: UpdateTaskDto,
+  ): Promise<void> {
+    const task = await this.taskService.getOneTask(id);
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    try {
+      return await this.taskService.updateTask(id, taskData);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Update failed');
+    }
   }
 
   @Get(':id')
-  getOneTask(id: number): Promise<Task | null> {
-    return this.taskService.getOneTasK(id);
+  async getOneTask(@Param('id') id: number): Promise<Task> {
+    const task = await this.taskService.getOneTask(id);
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+    return task;
   }
 }

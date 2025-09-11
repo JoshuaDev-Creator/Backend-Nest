@@ -1,34 +1,72 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Param,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { Project } from 'src/project/entities/project.entity';
 import { ProjectService } from 'src/project/project.service';
-import { createProjectDto } from './dto/create-project.dto';
-import { updateProjectDto } from './dto/update-project.dto';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
-@Controller('project')
+@Controller('projects')
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
   @Post()
-  creatProject(@Body() projectdata: createProjectDto): Promise<Project> {
-    return this.projectService.createProjectForUser(projectdata);
+  async createProject(@Body() projectData: CreateProjectDto): Promise<Project> {
+    try {
+      return await this.projectService.createProjectForUser(projectData);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Project creation failed');
+    }
   }
+
   @Delete(':id')
-  deleteProject(id: number): Promise<void> {
+  async deleteProject(@Param('id') id: number): Promise<void> {
+    const project = await this.projectService.getOneProject(id);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
     return this.projectService.deleteProject(id);
   }
 
   @Put(':id')
-  updateProject(id: number, projectdata: updateProjectDto): Promise<void> {
-    return this.projectService.updateProject(id, projectdata);
+  async updateProject(
+    @Param('id') id: number,
+    @Body() projectData: UpdateProjectDto,
+  ): Promise<void> {
+    const project = await this.projectService.getOneProject(id);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    try {
+      return await this.projectService.updateProject(id, projectData);
+    } catch (error) {
+      throw new BadRequestException(error.message || 'Update failed');
+    }
   }
 
   @Get(':id')
-  getOneProject(id: number): Promise<Project | null> {
-    return this.projectService.getOneProject(id);
+  async getOneProject(@Param('id') id: number): Promise<Project> {
+    const project = await this.projectService.getOneProject(id);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    return project;
   }
 
-  @Get(':id')
-  getTasksOfProject(id: number): Promise<Project | null> {
-    return this.projectService.getTasksOfProject(id);
+  @Get(':id/tasks')
+  async getTasksOfProject(@Param('id') id: number): Promise<Project> {
+    const project = await this.projectService.getTasksOfProject(id);
+    if (!project) {
+      throw new NotFoundException(`No tasks found for project with ID ${id}`);
+    }
+    return project;
   }
 }
