@@ -17,10 +17,6 @@ export class Project {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.projects)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
   @Column()
   title: string;
 
@@ -39,8 +35,12 @@ export class Project {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @OneToMany(() => Task, (Task) => Task.project)
-  task: any;
+  @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'user_id' })
+  userId: User;
+
+  @OneToMany(() => Task, (Task) => Task.projectId)
+  task: Task[];
 
   @OneToOne(() => Reminder, (Reminder) => Reminder.project)
   reminder: Reminder;

@@ -32,9 +32,9 @@ export class Task {
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
 
-  @ManyToOne(() => Project, (Project) => Project.task)
+  @ManyToOne(() => Project, (Project) => Project.task, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
-  project: Project;
+  projectId: Project;
 
   @ManyToOne(() => User, (User) => User.task)
   @JoinColumn({ name: 'assigned_to' })
