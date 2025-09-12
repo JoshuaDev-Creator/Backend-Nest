@@ -1,17 +1,17 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Migration17573974781757397479393 implements MigrationInterface {
-    name = 'Migration17573974781757397479393'
+export class Migration17576520991757652100332 implements MigrationInterface {
+    name = 'Migration17576520991757652100332'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE "task" (
                 "id" SERIAL NOT NULL,
-                "title" character varying(255) NOT NULL,
-                "description" text,
-                "status" character varying(50) NOT NULL,
-                "priority" character varying(50) NOT NULL,
-                "due_date" date,
+                "title" character varying NOT NULL,
+                "description" character varying NOT NULL,
+                "status" character varying NOT NULL DEFAULT 'PENDING',
+                "priority" character varying NOT NULL,
+                "due_date" TIMESTAMP NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "project_id" integer,
                 "assigned_to" integer,
@@ -22,7 +22,8 @@ export class Migration17573974781757397479393 implements MigrationInterface {
             CREATE TABLE "reminder" (
                 "id" SERIAL NOT NULL,
                 "title" character varying NOT NULL,
-                "meeting_time" TIMESTAMP NOT NULL,
+                "meetingDate" date NOT NULL,
+                "meetingTime" TIME NOT NULL,
                 "created_at" TIMESTAMP NOT NULL DEFAULT now(),
                 "user_id" integer,
                 "project_id" integer,
@@ -57,11 +58,12 @@ export class Migration17573974781757397479393 implements MigrationInterface {
         `);
         await queryRunner.query(`
             ALTER TABLE "task"
-            ADD CONSTRAINT "FK_1f53e7ffe94530f9e0221224d29" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_1f53e7ffe94530f9e0221224d29" FOREIGN KEY ("project_id") REFERENCES "project"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE "task"
-            ADD CONSTRAINT "FK_9eae030e5c6bb7da4c61b9ff404" FOREIGN KEY ("assigned_to") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_9eae030e5c6bb7da4c61b9ff404" FOREIGN KEY ("assigned_to") REFERENCES "user"("id") ON DELETE
+            SET NULL ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE "reminder"
@@ -73,7 +75,7 @@ export class Migration17573974781757397479393 implements MigrationInterface {
         `);
         await queryRunner.query(`
             ALTER TABLE "project"
-            ADD CONSTRAINT "FK_1cf56b10b23971cfd07e4fc6126" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_1cf56b10b23971cfd07e4fc6126" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
     }
 
