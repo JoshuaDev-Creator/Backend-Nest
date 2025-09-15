@@ -28,7 +28,7 @@ export class ReminderController {
   }
 
   @Get('id')
-  async getOneReminder(@Param('id') id: number): Promise<Reminder> {
+  async getReminderById(@Param('id') id: number): Promise<Reminder> {
     const reminder = await this.reminderService.getOneReminder(id);
     if (!reminder) {
       throw new NotFoundException(`Reminder with ID ${id} not found`);
@@ -37,7 +37,7 @@ export class ReminderController {
   }
 
   @Delete(':id')
-  async deleteReminder(@Param('id') id: number): Promise<void> {
+  async deleteReminderById(@Param('id') id: number): Promise<void> {
     const reminder = await this.reminderService.getOneReminder(id);
     if (!reminder) {
       throw new NotFoundException(`Reminder with ID ${id} not found`);

@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from 'src/project/entities/project.entity';
@@ -18,11 +19,25 @@ export class ProjectService {
 
   async createProjectForUser(projectData: CreateProjectDto): Promise<Project> {
     try {
-      const project = this.projectRepository.create(projectData);
+      const project = this.projectRepository.create({
+        ...projectData,
+        user: { id: projectData.userId },
+      });
       return await this.projectRepository.save(project);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  async getOneProject(id: number): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    return project;
   }
 
   async deleteProject(id: number): Promise<void> {
@@ -42,24 +57,36 @@ export class ProjectService {
     }
   }
 
-  async getOneProject(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOneBy({ id });
-    if (!project) {
-      throw new NotFoundException(`Project with ID ${id} not found`);
+  async getUserProjects(id: number): Promise<Project[]> {
+    if (!id) {
+      throw new BadRequestException('User ID is required');
     }
-    return project;
-  }
+    try {
+      const projects = await this.projectRepository.find({
+        where: { user: { id } },
+      });
 
-  async getTasksOfProject(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({
-      where: { id },
-      relations: ['tasks'],
-    });
-    if (!project) {
-      throw new NotFoundException(
-        `No project or tasks found for project ID ${id}`,
+      if (!projects || projects.length === 0) {
+        throw new NotFoundException(`No projects found for user with ID ${id}`);
+      }
+      return projects;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        `Failed to fetch projects for user ${id}: ${error.message}`,
       );
     }
-    return project;
   }
+
+  // async getTasksOfProject(id: number): Promise<Project> {
+  //   const project = await this.projectRepository.findOne({
+  //     where: { id },
+  //     relations: ['tasks'],
+  //   });
+  //   if (!project) {
+  //     throw new NotFoundException(
+  //       `No project or tasks found for project ID ${id}`,
+  //     );
+  //   }
+  //   return project;
+  // }
 }

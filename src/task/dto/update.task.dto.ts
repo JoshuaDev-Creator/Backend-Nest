@@ -1,4 +1,5 @@
 import { IsOptional, Length } from 'class-validator';
+import { TaskStatus } from '../entities/task.entity';
 
 export class UpdateTaskDto {
   @IsOptional()
@@ -10,7 +11,7 @@ export class UpdateTaskDto {
   description?: string;
 
   @IsOptional()
-  status?: string;
+  status?: TaskStatus;
 
   @IsOptional()
   priority?: string;

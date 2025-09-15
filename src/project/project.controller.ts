@@ -14,11 +14,11 @@ import { ProjectService } from 'src/project/project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 
-@Controller('projects')
+@Controller('project')
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
-  @Post()
+  @Post('/createProject')
   async createProject(@Body() projectData: CreateProjectDto): Promise<Project> {
     try {
       return await this.projectService.createProjectForUser(projectData);
@@ -27,7 +27,16 @@ export class ProjectController {
     }
   }
 
-  @Delete(':id')
+  @Get(':id')
+  async getOneProject(@Param('id') id: number): Promise<Project> {
+    const project = await this.projectService.getOneProject(id);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${id} not found`);
+    }
+    return project;
+  }
+
+  @Delete('deleteProject/:id')
   async deleteProject(@Param('id') id: number): Promise<void> {
     const project = await this.projectService.getOneProject(id);
     if (!project) {
@@ -36,7 +45,7 @@ export class ProjectController {
     return this.projectService.deleteProject(id);
   }
 
-  @Put(':id')
+  @Put('updateProject/:id')
   async updateProject(
     @Param('id') id: number,
     @Body() projectData: UpdateProjectDto,
@@ -52,21 +61,21 @@ export class ProjectController {
     }
   }
 
-  @Get(':id')
-  async getOneProject(@Param('id') id: number): Promise<Project> {
-    const project = await this.projectService.getOneProject(id);
-    if (!project) {
-      throw new NotFoundException(`Project with ID ${id} not found`);
+  @Get('allProjects/:id')
+  async getAllProjects(@Param('id') id: number): Promise<Project[]> {
+    const projects = await this.projectService.getUserProjects(id);
+    if (!projects || projects.length === 0) {
+      throw new NotFoundException(`No projects found for user ID ${id}`);
     }
-    return project;
+    return projects;
   }
 
-  @Get(':id/tasks')
-  async getTasksOfProject(@Param('id') id: number): Promise<Project> {
-    const project = await this.projectService.getTasksOfProject(id);
-    if (!project) {
-      throw new NotFoundException(`No tasks found for project with ID ${id}`);
-    }
-    return project;
-  }
+  // @Get(':id/tasks')
+  // async getTasksOfProject(@Param('id') id: number): Promise<Project> {
+  //   const project = await this.projectService.getTasksOfProject(id);
+  //   if (!project) {
+  //     throw new NotFoundException(`No tasks found for project with ID ${id}`);
+  //   }
+  //   return project;
+  // }
 }

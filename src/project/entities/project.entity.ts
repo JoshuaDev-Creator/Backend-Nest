@@ -26,20 +26,20 @@ export class Project {
   @Column({ default: 'ACTIVE' })
   status: string;
 
-  @Column({ type: 'date' })
-  start_date: string;
+  @Column({ type: 'date', name: 'start_date' })
+  startDate: string;
 
-  @Column({ type: 'date' })
-  end_date: string;
+  @Column({ type: 'date', name: 'end_date' })
+  endDate: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  createdAt: Date;
 
   @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  userId: User;
+  user: User;
 
-  @OneToMany(() => Task, (Task) => Task.projectId)
+  @OneToMany(() => Task, (task) => task.project)
   task: Task[];
 
   @OneToOne(() => Reminder, (Reminder) => Reminder.project)

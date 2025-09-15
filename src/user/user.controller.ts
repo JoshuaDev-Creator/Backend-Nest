@@ -13,9 +13,8 @@ import { UserService } from 'src/user/user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Project } from 'src/project/entities/project.entity';
 
-@Controller('users')
+@Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -28,30 +27,44 @@ export class UserController {
     }
   }
 
-  @Delete(':id')
-  async deleteUser(@Param('id') id: number): Promise<void> {
-    const user = await this.userService.getOneUser(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+  @Get('/allUsers')
+  async getAllUsers(): Promise<User[]> {
+    try {
+      return await this.userService.getAllUsers();
+    } catch (error) {
+      throw new BadRequestException(error.message);
     }
-    return this.userService.deleteUser(id);
+  }
+
+  @Get('/recentUsers')
+  async getRecentUsers(): Promise<User[]> {
+    return this.userService.GetRecentUsers();
   }
 
   @Get(':id')
   async getOneUser(@Param('id') id: number): Promise<any> {
-    const user = await this.userService.getOneUser(id);
+    const user = await this.userService.getUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
   }
 
-  @Put(':id')
+  @Delete('deleteUser/:id')
+  async deleteUser(@Param('id') id: number): Promise<void> {
+    const user = await this.userService.getUserById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return this.userService.deleteUserById(id);
+  }
+
+  @Put('updateUser/:id')
   async updateUser(
     @Param('id') id: number,
     @Body() userData: UpdateUserDto,
   ): Promise<void> {
-    const user = await this.userService.getOneUser(id);
+    const user = await this.userService.getUserById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -62,17 +75,12 @@ export class UserController {
     }
   }
 
-  @Get()
-  async getRecentUsers(): Promise<User[]> {
-    return this.userService.GetRecentUsers();
-  }
-
-  @Get(':id/projects')
-  async getProjectsOfUser(@Param('id') id: number): Promise<Project[]> {
-    const projects = await this.userService.getCorrespondingUserProjects(id);
-    if (!projects || projects.length === 0) {
-      throw new NotFoundException(`No projects found for user ID ${id}`);
-    }
-    return projects;
-  }
+  // @Get(':id/projects')
+  // async getProjectsOfUser(@Param('id') id: number): Promise<Project[]> {
+  //   const projects = await this.userService.getCorrespondingUserProjects(id);
+  //   if (!projects || projects.length === 0) {
+  //     throw new NotFoundException(`No projects found for user ID ${id}`);
+  //   }
+  //   return projects;
+  // }
 }

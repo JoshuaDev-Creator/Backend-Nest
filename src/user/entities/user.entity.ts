@@ -27,7 +27,7 @@ export class User {
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   createdAt: Date;
 
-  @OneToMany(() => Project, (project) => project.userId)
+  @OneToMany(() => Project, (project) => project.user)
   projects: Project[];
 
   @OneToMany(() => Task, (Task) => Task.user)

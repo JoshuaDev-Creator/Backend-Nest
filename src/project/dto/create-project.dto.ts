@@ -1,6 +1,9 @@
 import { Length, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateProjectDto {
+  @IsNotEmpty({ message: 'UserId is required' })
+  userId: number;
+
   @IsNotEmpty({ message: 'Title is required' })
   @Length(2, 50, { message: 'Title must be between 2 and 50 characters' })
   title: string;
@@ -12,8 +15,8 @@ export class CreateProjectDto {
   description: string;
 
   @IsNotEmpty({ message: 'Start date is required' })
-  start_date: string;
+  startDate: string;
 
   @IsNotEmpty({ message: 'Start date is required' })
-  end_date: string;
+  endDate: string;
 }

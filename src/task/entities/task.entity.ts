@@ -8,7 +8,12 @@ import {
 } from 'typeorm';
 import { Project } from '../../project/entities/project.entity';
 import { User } from '../../user/entities/user.entity';
-import { on } from 'events';
+
+export enum TaskStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
 
 @Entity()
 export class Task {
@@ -21,21 +26,21 @@ export class Task {
   @Column()
   description: string;
 
-  @Column({ default: 'PENDING' })
-  status: string;
+  @Column({ default: TaskStatus.PENDING, type: 'enum', enum: TaskStatus })
+  status: TaskStatus;
 
   @Column()
   priority: string;
 
-  @Column({ type: 'timestamp' })
-  due_date: string;
+  @Column({ type: 'timestamp', name: 'due_date' })
+  dueDate: string;
 
-  @CreateDateColumn({ type: 'timestamp' })
-  created_at: Date;
+  @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
+  createdAt: Date;
 
   @ManyToOne(() => Project, (Project) => Project.task, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'project_id' })
-  projectId: Project;
+  project: Project;
 
   @ManyToOne(() => User, (User) => User.task, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'assigned_to' })
