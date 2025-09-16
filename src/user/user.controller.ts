@@ -74,13 +74,4 @@ export class UserController {
       throw new BadRequestException(error.message);
     }
   }
-
-  // @Get(':id/projects')
-  // async getProjectsOfUser(@Param('id') id: number): Promise<Project[]> {
-  //   const projects = await this.userService.getCorrespondingUserProjects(id);
-  //   if (!projects || projects.length === 0) {
-  //     throw new NotFoundException(`No projects found for user ID ${id}`);
-  //   }
-  //   return projects;
-  // }
 }
