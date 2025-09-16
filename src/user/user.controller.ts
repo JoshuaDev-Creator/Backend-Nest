@@ -28,7 +28,7 @@ export class UserController {
     }
   }
 
-  @Get('/allUsers')
+  @Get()
   async getAllUsers(): Promise<User[]> {
     try {
       return await this.userService.getAllUsers();
@@ -37,7 +37,7 @@ export class UserController {
     }
   }
 
-  @Get('/recentUsers')
+  @Get('/recent')
   async getRecentUsers(): Promise<User[]> {
     return this.userService.GetRecentUsers();
   }
