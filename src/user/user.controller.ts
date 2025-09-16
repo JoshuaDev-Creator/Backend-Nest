@@ -13,6 +13,7 @@ import { UserService } from 'src/user/user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Task } from 'src/task/entities/task.entity';
 
 @Controller('user')
 export class UserController {
@@ -50,7 +51,7 @@ export class UserController {
     return user;
   }
 
-  @Delete('deleteUser/:id')
+  @Delete(':id')
   async deleteUser(@Param('id') id: number): Promise<void> {
     const user = await this.userService.getUserById(id);
     if (!user) {
@@ -59,7 +60,7 @@ export class UserController {
     return this.userService.deleteUserById(id);
   }
 
-  @Put('updateUser/:id')
+  @Put(':id')
   async updateUser(
     @Param('id') id: number,
     @Body() userData: UpdateUserDto,
@@ -73,5 +74,14 @@ export class UserController {
     } catch (error) {
       throw new BadRequestException(error.message);
     }
+  }
+
+  @Get(':id/task')
+  async getTasks(@Param('id') id: number): Promise<Task[]> {
+    const task = await this.userService.getTasks(id);
+    if (!task) {
+      throw new NotFoundException(`No tasks found for user with ID ${id}`);
+    }
+    return task;
   }
 }

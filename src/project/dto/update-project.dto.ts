@@ -10,5 +10,5 @@ export class UpdateProjectDto {
   description?: string;
 
   @IsOptional()
-  end_date?: string;
+  endDate?: string;
 }
