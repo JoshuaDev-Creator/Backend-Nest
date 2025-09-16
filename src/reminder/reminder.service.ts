@@ -15,9 +15,7 @@ export class ReminderService {
     private reminderRepository: Repository<Reminder>,
   ) {}
 
-  async createReminderForProject(
-    reminderData: CreateReminderDto,
-  ): Promise<Reminder> {
+  async create(reminderData: CreateReminderDto): Promise<Reminder> {
     try {
       const reminder = this.reminderRepository.create(reminderData);
       return await this.reminderRepository.save(reminder);
@@ -26,18 +24,16 @@ export class ReminderService {
     }
   }
 
-  async deleteReminder(id: number): Promise<void> {
-    const result = await this.reminderRepository.delete(id);
-    if (result.affected === 0) {
+  async getById(id: number): Promise<Reminder> {
+    const reminder = await this.reminderRepository.findOneBy({ id });
+    if (!reminder)
       throw new NotFoundException(`Reminder with ID ${id} not found`);
-    }
+    return reminder;
   }
 
-  async getOneReminder(id: number): Promise<Reminder> {
-    const reminder = await this.reminderRepository.findOneBy({ id });
-    if (!reminder) {
+  async delete(id: number): Promise<void> {
+    const result = await this.reminderRepository.delete(id);
+    if (result.affected === 0)
       throw new NotFoundException(`Reminder with ID ${id} not found`);
-    }
-    return reminder;
   }
 }

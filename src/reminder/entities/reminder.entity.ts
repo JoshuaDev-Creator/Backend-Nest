@@ -22,8 +22,12 @@ export class Reminder {
   @Column({ type: 'time without time zone' })
   meetingTime: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  created_at: Date;
+  @Column({
+    name: 'created_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 
   @OneToOne(() => User, (User) => User.reminder)
   @JoinColumn({ name: 'user_id' })

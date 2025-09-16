@@ -12,36 +12,33 @@ import { ReminderService } from './reminder.service';
 import { Reminder } from './entities/reminder.entity';
 import { CreateReminderDto } from './dto/create-reminder.dto';
 
-@Controller('reminders')
+@Controller('reminder')
 export class ReminderController {
   constructor(private reminderService: ReminderService) {}
 
   @Post()
-  async createReminder(
-    @Body() reminderData: CreateReminderDto,
-  ): Promise<Reminder> {
+  async create(@Body() data: CreateReminderDto): Promise<Reminder> {
     try {
-      return await this.reminderService.createReminderForProject(reminderData);
+      return await this.reminderService.create(data);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
   @Get('id')
-  async getReminderById(@Param('id') id: number): Promise<Reminder> {
-    const reminder = await this.reminderService.getOneReminder(id);
-    if (!reminder) {
+  async getById(@Param('id') id: number): Promise<Reminder> {
+    const reminder = await this.reminderService.getById(id);
+    if (!reminder)
       throw new NotFoundException(`Reminder with ID ${id} not found`);
-    }
     return reminder;
   }
 
   @Delete(':id')
-  async deleteReminderById(@Param('id') id: number): Promise<void> {
-    const reminder = await this.reminderService.getOneReminder(id);
-    if (!reminder) {
+  async delete(@Param('id') id: number): Promise<void> {
+    const reminder = await this.reminderService.getById(id);
+    if (!reminder)
       throw new NotFoundException(`Reminder with ID ${id} not found`);
-    }
-    return this.reminderService.deleteReminder(id);
+
+    return this.reminderService.delete(id);
   }
 }

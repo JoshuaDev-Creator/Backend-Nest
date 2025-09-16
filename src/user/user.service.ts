@@ -8,16 +8,14 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Task } from 'src/task/entities/task.entity';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  async createUser(userData: CreateUserDto): Promise<User> {
+  async create(userData: CreateUserDto): Promise<User> {
     try {
       const user = this.userRepository.create(userData);
       return await this.userRepository.save(user);
@@ -26,51 +24,38 @@ export class UserService {
     }
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async update(id: number, userData: UpdateUserDto): Promise<void> {
+    const result = await this.userRepository.update(id, userData);
+    if (result.affected === 0)
+      throw new NotFoundException(`User with ID ${id} not found`);
+  }
+
+  async getAll(): Promise<User[]> {
     return this.userRepository.find({
       select: ['email', 'name'],
     });
   }
 
-  async GetRecentUsers(): Promise<User[]> {
+  async getRecent(): Promise<User[]> {
     return this.userRepository.find({
       order: { createdAt: 'ASC' },
       take: 5,
     });
   }
 
-  async getUserById(id: number): Promise<{ email: string; name: string }> {
+  async getById(id: number): Promise<{ email: string; name: string }> {
     const user = await this.userRepository.findOne({
       where: { id },
       select: ['email', 'name'],
     });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
+    if (!user) throw new NotFoundException(`User with ID ${id} not found`);
+
     return user;
   }
 
-  async deleteUserById(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     const result = await this.userRepository.delete(id);
-    if (result.affected === 0) {
+    if (result.affected === 0)
       throw new NotFoundException(`User with ID ${id} not found`);
-    }
-  }
-
-  async UpdateUser(id: number, userData: UpdateUserDto): Promise<void> {
-    const result = await this.userRepository.update(id, userData);
-    if (result.affected === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-  }
-
-  async getTasks(id: number): Promise<Task[]> {
-    const tasks = await this.taskRepository.find({
-      where: { user: { id } },
-    });
-    if (!tasks) {
-      throw new NotFoundException(`No tasks  for user ID ${id}`);
-    }
-    return tasks;
   }
 }

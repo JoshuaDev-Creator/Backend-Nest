@@ -21,13 +21,10 @@ export class ProjectService {
     private taskRepository: Repository<Task>,
   ) {}
 
-  async createProject(
-    userId: number,
-    projectData: CreateProjectDto,
-  ): Promise<Project> {
+  async create(userId: number, data: CreateProjectDto): Promise<Project> {
     try {
       const project = this.projectRepository.create({
-        ...projectData,
+        ...data,
         user: { id: userId },
       });
       return await this.projectRepository.save(project);
@@ -36,13 +33,15 @@ export class ProjectService {
     }
   }
 
-  async createTask(projectId: number, taskData: CreateTaskDto): Promise<Task> {
-    console.log(taskData);
+  async createTaskByProjectId(
+    projectId: number,
+    data: CreateTaskDto,
+  ): Promise<Task> {
     try {
       const task = this.taskRepository.create({
-        ...taskData,
+        ...data,
         project: { id: projectId },
-        user: { id: taskData.userId },
+        user: { id: data.userId },
       });
       return await this.taskRepository.save(task);
     } catch (error) {
@@ -50,7 +49,7 @@ export class ProjectService {
     }
   }
 
-  async getOneProject(id: number): Promise<Project> {
+  async getById(id: number): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id },
       relations: ['user'],
@@ -61,24 +60,20 @@ export class ProjectService {
     return project;
   }
 
-  async deleteProject(id: number): Promise<void> {
+  async delete(id: number): Promise<void> {
     const result = await this.projectRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
   }
 
-  async updateProject(
-    id: number,
-    projectData: UpdateProjectDto,
-  ): Promise<void> {
-    const result = await this.projectRepository.update(id, projectData);
-    if (result.affected === 0) {
+  async update(id: number, data: UpdateProjectDto): Promise<void> {
+    const result = await this.projectRepository.update(id, data);
+    if (result.affected === 0)
       throw new NotFoundException(`Project with ID ${id} not found`);
-    }
   }
 
-  async getUserProjects(id: number): Promise<Project[]> {
+  async getAllByUserId(id: number): Promise<Project[]> {
     if (!id) {
       throw new BadRequestException('User ID is required');
     }
@@ -87,9 +82,9 @@ export class ProjectService {
         where: { user: { id } },
       });
 
-      if (!projects || projects.length === 0) {
+      if (!projects || projects.length === 0)
         throw new NotFoundException(`No projects found for user with ID ${id}`);
-      }
+
       return projects;
     } catch (error) {
       throw new InternalServerErrorException(
@@ -98,13 +93,12 @@ export class ProjectService {
     }
   }
 
-  async getTasks(id: number): Promise<Task[]> {
+  async getTaskByProjectId(id: number): Promise<Task[]> {
     const tasks = await this.taskRepository.find({
       where: { project: { id } },
     });
-    if (!tasks) {
-      throw new NotFoundException(`No tasks  for project ID ${id}`);
-    }
+    if (!tasks) throw new NotFoundException(`No tasks  for project ID ${id}`);
+
     return tasks;
   }
 }

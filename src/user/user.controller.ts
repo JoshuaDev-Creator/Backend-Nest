@@ -13,38 +13,53 @@ import { UserService } from 'src/user/user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Task } from 'src/task/entities/task.entity';
 
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post()
-  async createUser(@Body() userData: CreateUserDto): Promise<User> {
+  async create(@Body() userData: CreateUserDto): Promise<User> {
     try {
-      return await this.userService.createUser(userData);
+      return await this.userService.create(userData);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id: number,
+    @Body() userData: UpdateUserDto,
+  ): Promise<void> {
+    const user = await this.userService.getById(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    try {
+      return await this.userService.update(id, userData);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
   @Get()
-  async getAllUsers(): Promise<User[]> {
+  async getAll(): Promise<User[]> {
     try {
-      return await this.userService.getAllUsers();
+      return await this.userService.getAll();
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
   @Get('/recent')
-  async getRecentUsers(): Promise<User[]> {
-    return this.userService.GetRecentUsers();
+  async getRecent(): Promise<User[]> {
+    return this.userService.getRecent();
   }
 
   @Get(':id')
-  async getOneUser(@Param('id') id: number): Promise<any> {
-    const user = await this.userService.getUserById(id);
+  async getById(@Param('id') id: number): Promise<any> {
+    const user = await this.userService.getById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -52,36 +67,11 @@ export class UserController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: number): Promise<void> {
-    const user = await this.userService.getUserById(id);
+  async delete(@Param('id') id: number): Promise<void> {
+    const user = await this.userService.getById(id);
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return this.userService.deleteUserById(id);
-  }
-
-  @Put(':id')
-  async updateUser(
-    @Param('id') id: number,
-    @Body() userData: UpdateUserDto,
-  ): Promise<void> {
-    const user = await this.userService.getUserById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-    try {
-      return await this.userService.UpdateUser(id, userData);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  @Get(':id/task')
-  async getTasks(@Param('id') id: number): Promise<Task[]> {
-    const task = await this.userService.getTasks(id);
-    if (!task) {
-      throw new NotFoundException(`No tasks found for user with ID ${id}`);
-    }
-    return task;
+    return this.userService.delete(id);
   }
 }
