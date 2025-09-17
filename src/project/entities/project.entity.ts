@@ -42,6 +42,6 @@ export class Project {
   @OneToMany(() => Task, (task) => task.project)
   task: Task[];
 
-  @OneToOne(() => Reminder, (Reminder) => Reminder.project)
-  reminder: Reminder;
+  @OneToMany(() => Reminder, (Reminder) => Reminder.project)
+  reminder: Reminder[];
 }

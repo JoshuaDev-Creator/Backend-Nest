@@ -16,4 +16,7 @@ export class CreateProjectDto {
 
   @IsNotEmpty({ message: 'Start date is required' })
   endDate: string;
+
+  @IsNotEmpty({ message: 'User Id is required for creating project' })
+  userId: number;
 }

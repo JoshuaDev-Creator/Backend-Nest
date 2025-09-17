@@ -1,10 +1,9 @@
 import { Project } from '../../project/entities/project.entity';
-import { User } from '../../user/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -29,11 +28,7 @@ export class Reminder {
   })
   createdAt: Date;
 
-  @OneToOne(() => User, (User) => User.reminder)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
-
-  @OneToOne(() => Project, (project) => project.reminder)
+  @ManyToOne(() => Project, (project) => project.reminder)
   @JoinColumn({ name: 'project_id' })
   project: Project;
 }

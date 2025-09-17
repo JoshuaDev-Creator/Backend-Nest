@@ -11,6 +11,8 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateTaskDto } from '../task/dto/create-task.dto';
 import { Task } from '../task/entities/task.entity';
+import { CreateReminderDto } from 'src/reminder/dto/create-reminder.dto';
+import { Reminder } from '../reminder/entities/reminder.entity';
 
 @Injectable()
 export class ProjectService {
@@ -19,13 +21,15 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
     @InjectRepository(Task)
     private taskRepository: Repository<Task>,
+    @InjectRepository(Reminder)
+    private reminderRepository: Repository<Reminder>,
   ) {}
 
-  async create(userId: number, data: CreateProjectDto): Promise<Project> {
+  async create(data: CreateProjectDto): Promise<Project> {
     try {
       const project = this.projectRepository.create({
         ...data,
-        user: { id: userId },
+        user: { id: data.userId },
       });
       return await this.projectRepository.save(project);
     } catch (error) {
@@ -44,6 +48,21 @@ export class ProjectService {
         user: { id: data.userId },
       });
       return await this.taskRepository.save(task);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  async createReminderByProjectId(
+    projectId,
+    reminderData: CreateReminderDto,
+  ): Promise<Reminder> {
+    try {
+      const reminder = this.reminderRepository.create({
+        ...reminderData,
+        project: { id: projectId },
+      });
+      return await this.reminderRepository.save(reminder);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

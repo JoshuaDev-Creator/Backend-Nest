@@ -16,16 +16,7 @@ import { CreateReminderDto } from './dto/create-reminder.dto';
 export class ReminderController {
   constructor(private reminderService: ReminderService) {}
 
-  @Post()
-  async create(@Body() data: CreateReminderDto): Promise<Reminder> {
-    try {
-      return await this.reminderService.create(data);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
-  @Get('id')
+  @Get(':id')
   async getById(@Param('id') id: number): Promise<Reminder> {
     const reminder = await this.reminderService.getById(id);
     if (!reminder)

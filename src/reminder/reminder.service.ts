@@ -15,15 +15,6 @@ export class ReminderService {
     private reminderRepository: Repository<Reminder>,
   ) {}
 
-  async create(reminderData: CreateReminderDto): Promise<Reminder> {
-    try {
-      const reminder = this.reminderRepository.create(reminderData);
-      return await this.reminderRepository.save(reminder);
-    } catch (error) {
-      throw new BadRequestException(error.message);
-    }
-  }
-
   async getById(id: number): Promise<Reminder> {
     const reminder = await this.reminderRepository.findOneBy({ id });
     if (!reminder)

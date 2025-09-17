@@ -15,18 +15,17 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CreateTaskDto } from '../task/dto/create-task.dto';
 import { Task } from '../task/entities/task.entity';
+import { CreateReminderDto } from '../reminder/dto/create-reminder.dto';
+import { Reminder } from '../reminder/entities/reminder.entity';
 
 @Controller('project')
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
 
-  @Post(':userId')
-  async create(
-    @Param('userId') userId: number,
-    @Body() data: CreateProjectDto,
-  ): Promise<Project> {
+  @Post()
+  async create(@Body() data: CreateProjectDto): Promise<Project> {
     try {
-      return await this.projectService.create(userId, data);
+      return await this.projectService.create(data);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
@@ -39,6 +38,21 @@ export class ProjectController {
   ): Promise<Task> {
     try {
       return await this.projectService.createTaskByProjectId(id, data);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Post(':projectId/reminder')
+  async createReminderByProjectId(
+    @Param('projectId') projectId: number,
+    @Body() data: CreateReminderDto,
+  ): Promise<Reminder> {
+    try {
+      return await this.projectService.createReminderByProjectId(
+        projectId,
+        data,
+      );
     } catch (error) {
       throw new BadRequestException(error.message);
     }

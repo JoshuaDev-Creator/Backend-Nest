@@ -32,7 +32,4 @@ export class User {
 
   @OneToMany(() => Task, (Task) => Task.user)
   task: Task[];
-
-  @OneToOne(() => Reminder, (Reminder) => Reminder.user)
-  reminder: Reminder;
 }
