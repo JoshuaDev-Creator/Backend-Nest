@@ -5,14 +5,17 @@ import {
   Get,
   Post,
   Put,
-  Param,
   NotFoundException,
   BadRequestException,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -27,23 +30,26 @@ export class UserController {
     }
   }
 
-  @Put(':id')
+  @UseGuards(JwtAuthGuard)
+  @Put()
   async update(
-    @Param('id') id: number,
+    @Req() req: Request,
     @Body() userData: UpdateUserDto,
   ): Promise<void> {
-    const user = await this.userService.getById(id);
+    const userId = (req as any).user['userId'];
+
+    const user = await this.userService.getById(userId);
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     try {
-      return await this.userService.update(id, userData);
+      return await this.userService.update(userId, userData);
     } catch (error) {
       throw new BadRequestException(error.message);
     }
   }
 
-  @Get()
+  @Get('list')
   async getAll(): Promise<User[]> {
     try {
       return await this.userService.getAll();
@@ -57,21 +63,25 @@ export class UserController {
     return this.userService.getRecent();
   }
 
-  @Get(':id')
-  async getById(@Param('id') id: number): Promise<any> {
-    const user = await this.userService.getById(id);
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async getById(@Req() req: Request): Promise<any> {
+    const userId = (req as any).user['userId'];
+    const user = await this.userService.getById(userId);
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
     return user;
   }
 
-  @Delete(':id')
-  async delete(@Param('id') id: number): Promise<void> {
-    const user = await this.userService.getById(id);
+  @UseGuards(JwtAuthGuard)
+  @Delete()
+  async delete(@Req() req: Request): Promise<void> {
+    const userId = (req as any).user['userId'];
+    const user = await this.userService.getById(userId);
     if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${userId} not found`);
     }
-    return this.userService.delete(id);
+    return this.userService.delete(userId);
   }
 }

@@ -29,7 +29,7 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { user };
+    const payload = { sub: user.id, email: user.email };
     return {
       accessToken: this.jwtService.sign(payload),
     };
@@ -37,7 +37,9 @@ export class AuthService {
 
   async verifyToken(token: string) {
     try {
-      return this.jwtService.verify(token);
+      const payload = this.jwtService.verify(token);
+      const data = this.userService.getById(payload.sub);
+      return data;
     } catch {
       throw new UnauthorizedException('Invalid token');
     }
