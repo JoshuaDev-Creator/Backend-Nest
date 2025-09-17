@@ -43,16 +43,13 @@ export class ProjectController {
     }
   }
 
-  @Post(':projectId/reminder')
+  @Post(':id/reminder')
   async createReminderByProjectId(
-    @Param('projectId') projectId: number,
+    @Param('id') id: number,
     @Body() data: CreateReminderDto,
   ): Promise<Reminder> {
     try {
-      return await this.projectService.createReminderByProjectId(
-        projectId,
-        data,
-      );
+      return await this.projectService.createReminderByProjectId(id, data);
     } catch (error) {
       throw new BadRequestException(error.message);
     }

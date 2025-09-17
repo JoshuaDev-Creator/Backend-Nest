@@ -37,14 +37,11 @@ export class ProjectService {
     }
   }
 
-  async createTaskByProjectId(
-    projectId: number,
-    data: CreateTaskDto,
-  ): Promise<Task> {
+  async createTaskByProjectId(id: number, data: CreateTaskDto): Promise<Task> {
     try {
       const task = this.taskRepository.create({
         ...data,
-        project: { id: projectId },
+        project: { id },
         user: { id: data.userId },
       });
       return await this.taskRepository.save(task);
@@ -54,13 +51,13 @@ export class ProjectService {
   }
 
   async createReminderByProjectId(
-    projectId,
+    id,
     reminderData: CreateReminderDto,
   ): Promise<Reminder> {
     try {
       const reminder = this.reminderRepository.create({
         ...reminderData,
-        project: { id: projectId },
+        project: { id },
       });
       return await this.reminderRepository.save(reminder);
     } catch (error) {
