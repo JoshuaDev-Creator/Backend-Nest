@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.modue';
 import { ReminderModule } from './reminder/reminder.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ReminderModule } from './reminder/reminder.module';
     ProjectModule,
     TaskModule,
     ReminderModule,
+    AuthModule,
   ],
 })
 export class AppModule {}
